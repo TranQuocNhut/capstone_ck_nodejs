@@ -54,6 +54,12 @@ async function bootstrap() {
   // Swagger setup
   setupSwagger(app);
 
+  // Auto redirect from root (/) to Swagger Docs (/api/docs)
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.get('/', (req, res) => {
+    res.redirect('/api/docs');
+  });
+
   const port = configService.get<number>('PORT', 3000);
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}/api/v1`);
