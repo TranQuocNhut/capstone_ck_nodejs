@@ -1,8 +1,8 @@
 # Build stage
 FROM node:18-alpine AS builder
 
-# Install build tools for native dependencies like bcrypt
-RUN apk add --no-cache python3 make g++
+# Install build tools for native dependencies like bcrypt & openssl
+RUN apk add --no-cache python3 make g++ openssl
 
 WORKDIR /app
 
@@ -18,6 +18,9 @@ RUN npm run build
 
 # Production stage
 FROM node:18-alpine
+
+# Install openssl for Prisma runtime compatibility on alpine
+RUN apk add --no-cache openssl
 
 WORKDIR /app
 
