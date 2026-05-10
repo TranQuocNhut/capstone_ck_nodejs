@@ -37,6 +37,14 @@ export class RedisIoAdapter extends IoAdapter {
     }
     const subClient = pubClient.duplicate();
 
+    // Register error handlers to prevent unhandled error event crashes
+    pubClient.on('error', (err) => {
+      console.error('[RedisIoAdapter] pubClient connection error:', err.message);
+    });
+    subClient.on('error', (err) => {
+      console.error('[RedisIoAdapter] subClient connection error:', err.message);
+    });
+
     // The ioredis clients will connect automatically
     this.adapterConstructor = createAdapter(pubClient, subClient);
   }
