@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../../users/services/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -11,14 +11,13 @@ import { Queue } from 'bullmq';
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
     private prisma: PrismaService,
     @InjectQueue('notification') private readonly notificationQueue: Queue,
-  ) {}
+  ) { }
 
   async register(registerDto: RegisterDto) {
     const user = await this.usersService.create({
@@ -35,7 +34,7 @@ export class AuthService {
         fullName: user.fullName || 'User',
       });
     } catch (err) {
-      this.logger.error('Failed to queue welcome email job', err);
+      console.error('Failed to queue welcome email job', err);
     }
 
     return user;
@@ -179,7 +178,7 @@ export class AuthService {
         token: resetToken,
       });
     } catch (err) {
-      this.logger.error('Failed to queue reset password email job', err);
+      console.error('Failed to queue reset password email job', err);
     }
 
     return {

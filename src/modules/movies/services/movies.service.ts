@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../providers/database/prisma.service';
 import { CreateMovieDto } from '../dto/create-movie.dto';
 import { UpdateMovieDto } from '../dto/update-movie.dto';
@@ -6,12 +6,10 @@ import { CloudinaryService } from '../../../providers/cloudinary/cloudinary.serv
 
 @Injectable()
 export class MoviesService {
-  private readonly logger = new Logger(MoviesService.name);
-
   constructor(
     private prisma: PrismaService,
     private cloudinaryService: CloudinaryService,
-  ) {}
+  ) { }
 
   async getBanners() {
     return this.prisma.banner.findMany({
@@ -110,7 +108,7 @@ export class MoviesService {
         },
       });
     } catch (err) {
-      this.logger.error('Failed to create movie banner', err);
+      console.error('Failed to create movie banner', err);
     }
 
     return movie;
