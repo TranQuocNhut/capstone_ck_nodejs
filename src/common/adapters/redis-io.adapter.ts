@@ -18,6 +18,9 @@ export class RedisIoAdapter extends IoAdapter {
     const host = this.configService.get<string>('redis.host') || 'localhost';
     const port = this.configService.get<number>('redis.port') || 6379;
     const password = this.configService.get<string>('redis.password');
+    
+    // Diagnostic logging
+    console.log(`[RedisIoAdapter] Attempting connection. Host (truncated): ${host.substring(0, 30)}..., Port: ${port}`);
 
     let pubClient: Redis;
     if (host.startsWith('redis://') || host.startsWith('rediss://')) {

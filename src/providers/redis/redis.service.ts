@@ -19,6 +19,9 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     const port = this.configService.get<number>('REDIS_PORT', 6379);
     const password = this.configService.get<string>('REDIS_PASSWORD');
 
+    // Diagnostic logging
+    console.log(`[RedisService] Attempting connection. Host (truncated): ${host.substring(0, 30)}..., Port: ${port}`);
+
     if (host.startsWith('redis://') || host.startsWith('rediss://')) {
       this.client = new Redis(host);
     } else {
