@@ -1,0 +1,143 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int       @id @default(autoincrement())
+  fullName        String
+  email           String    @unique
+  phoneNumber     String
+  password        String
+  role            String    @default("USER") // USER or ADMIN
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  profile         Profile?
+  sessions        Session[]
+  messages        Message[]
+  bookings        Booking[]
+}
+
+model Movie {
+  id              Int       @id @default(autoincrement())
+  title           String
+  trailer         String
+  imageUrl        String
+  description     String
+  releaseDate     DateTime
+  rating          Int
+  isHot           Boolean   @default(false)
+  isShowing       Boolean   @default(true)
+  isComing        Boolean   @default(false)
+
+  banners         Banner[]
+  showtimes       Showtime[]
+}
+
+model Banner {
+  id              Int    @id @default(autoincrement())
+  movieId         Int
+  imageUrl        String
+
+  movie           Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+}
+
+model CinemaSystem {
+  id              Int             @id @default(autoincrement())
+  name            String
+  logo            String
+
+  complexes       CinemaComplex[]
+}
+
+model CinemaComplex {
+  id              Int          @id @default(autoincrement())
+  name            String
+  address         String
+  systemId        Int
+
+  system          CinemaSystem @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  theaters        Theater[]
+}
+
+model Theater {
+  id              Int        @id @default(autoincrement())
+  name            String
+  complexId       Int
+
+  complex         CinemaComplex @relation(fields: [complexId], references: [id], onDelete: Cascade)
+  seats           Seat[]
+  showtimes       Showtime[]
+}
+
+model Seat {
+  id              Int       @id @default(autoincrement())
+  name            String
+  type            String    @default("Regular") // Regular or VIP
+  theaterId       Int
+
+  theater         Theater   @relation(fields: [theaterId], references: [id], onDelete: Cascade)
+  bookings        Booking[]
+}
+
+model Showtime {
+  id              Int       @id @default(autoincrement())
+  theaterId       Int
+  movieId         Int
+  showTime        DateTime
+  price           Int
+
+  theater         Theater   @relation(fields: [theaterId], references: [id], onDelete: Cascade)
+  movie           Movie     @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  bookings        Booking[]
+}
+
+model Booking {
+  userId          Int
+  showtimeId      Int
+  seatId          Int
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  showtime        Showtime  @relation(fields: [showtimeId], references: [id], onDelete: Cascade)
+  seat            Seat      @relation(fields: [seatId], references: [id], onDelete: Cascade)
+
+  @@id([userId, showtimeId, seatId])
+}
+
+model Profile {
+  id        String   @id @default(uuid())
+  bio       String?
+  avatarUrl String?
+  userId    Int      @unique
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  refreshToken String   @unique
+  expiresAt    DateTime
+  userId       Int
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  content   String
+  userId    Int
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room      String   @default("general")
+  createdAt DateTime @default(now())
+}
